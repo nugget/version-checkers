@@ -10,10 +10,10 @@ import (
 	"gopkg.in/headzoo/surf.v1"
 )
 
-var (
-	BaseURI string = "https://support.ruckuswireless.com"
-)
+// BaseURI is the web location of the Ruckus support site.
+const BaseURI = "https://support.ruckuswireless.com"
 
+// Release represents a single firmware release from the vendor.
 type Release struct {
 	BaseVersion   string
 	ID            string
@@ -25,7 +25,8 @@ type Release struct {
 	Date          time.Time
 }
 
-func (r *Release) ImportTD(s *goquery.Selection) error {
+// ImportRow parses an HTML row from the website into a Release object.
+func (r *Release) ImportRow(s *goquery.Selection) error {
 	r.BaseVersion, _ = s.Attr("data-version")
 	r.ID, _ = s.Attr("id")
 
@@ -56,6 +57,8 @@ func (r *Release) ImportTD(s *goquery.Selection) error {
 	return nil
 }
 
+// ExpandedVersion takes a literal version string and converts it into tha
+// human-readable form exposed in SNMP and in the ZoneDirector web console.
 func ExpandedVersion(version string) string {
 	i := strings.Split(version, ".")
 	if len(i) == 5 {
@@ -65,6 +68,7 @@ func ExpandedVersion(version string) string {
 	return version
 }
 
+// GetReleaseList fetches the list of current firmware releases from the vendor website.
 func GetReleaseList(filter int) (releaseList []Release, err error) {
 	bow := surf.NewBrowser()
 	err = bow.Open(BaseURI + fmt.Sprintf("/software?filter=%d#firmwares", filter))
@@ -74,7 +78,7 @@ func GetReleaseList(filter int) (releaseList []Release, err error) {
 
 	bow.Find("tr.software").Each(func(i int, s *goquery.Selection) {
 		r := Release{}
-		r.ImportTD(s)
+		r.ImportRow(s)
 
 		releaseList = append(releaseList, r)
 	})
@@ -82,6 +86,7 @@ func GetReleaseList(filter int) (releaseList []Release, err error) {
 	return releaseList, nil
 }
 
+// FindLatest examines a release list slice and finds the latest version within.
 func FindLatest(releaseList []Release, fileType string) Release {
 	latest := Release{}
 
