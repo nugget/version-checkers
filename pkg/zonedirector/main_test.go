@@ -11,7 +11,7 @@ func TestExpandedVersion(t *testing.T) {
 		expected    string // expected result
 		description string // what we are testing
 	}{
-		{"10.20.30.40.50", "10.20.30.40 build 5", "valid version string"},
+		{"10.20.30.40.50", "10.20.30.40 build 50", "valid version string"},
 		{"10.20.30", "10.20.30", "Unrecognized version string"},
 	}
 
