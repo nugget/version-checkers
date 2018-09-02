@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/nugget/version-checkers/pkg/config"
 	"github.com/nugget/version-checkers/pkg/zonedirector"
 
 	"encoding/json"
