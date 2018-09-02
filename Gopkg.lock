@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/headzoo/surf"
@@ -56,7 +56,7 @@
     "html",
     "html/atom"
   ]
-  revision = "e514e69ffb8bc3c76a71ae40de0118d794855992"
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [[projects]]
   name = "gopkg.in/headzoo/surf.v1"
