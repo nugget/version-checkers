@@ -28,6 +28,7 @@ install:
 	cp -rp build/macos/vc-zonedirector $(HOME)/bin/
 
 zabbix: build/freebsd/vc-zonedirector
+	chmod 755 build/freebsd/vc-zonedirector
 	scp -rp build/freebsd/vc-zonedirector zabbix.nuggethaus.net:/usr/local/etc/zabbix34/zabbix/externalscripts
 
 clean:
