@@ -1,6 +1,7 @@
 package zonedirector
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ const BaseURI = "https://support.ruckuswireless.com"
 
 // Release represents a single firmware release from the vendor.
 type Release struct {
+	OK            bool
 	BaseVersion   string
 	ID            string
 	Version       string
@@ -23,12 +25,24 @@ type Release struct {
 	Description   string
 	FileType      string
 	Date          time.Time
+	Epoch         int64
 }
 
 // ImportRow parses an HTML row from the website into a Release object.
 func (r *Release) ImportRow(s *goquery.Selection) error {
-	r.BaseVersion, _ = s.Attr("data-version")
-	r.ID, _ = s.Attr("id")
+	var ok bool
+
+	r.OK = false
+
+	r.BaseVersion, ok = s.Attr("data-version")
+	if !ok {
+		return errors.New("ImportRow Unable to parse selection for data-version")
+	}
+
+	r.ID, ok = s.Attr("id")
+	if !ok {
+		return errors.New("ImportRow Unable to parse selection for id")
+	}
 
 	s.Find("a").Each(func(i int, a *goquery.Selection) {
 		r.URI, _ = a.Attr("href")
@@ -45,14 +59,16 @@ func (r *Release) ImportRow(s *goquery.Selection) error {
 			r.FileType = td.Text()
 		case 3:
 			tt, err := time.Parse("2006-01-02", td.Text())
-			if err != nil {
-				panic(fmt.Sprintf("Error parsing date %v: %v\n", td.Text(), err))
+			if err == nil {
+				r.Date = tt
+				r.Epoch = tt.Unix()
 			}
-			r.Date = tt
 		}
 	})
 
 	r.VersionString = ExpandedVersion(r.Version)
+
+	r.OK = true
 
 	return nil
 }
