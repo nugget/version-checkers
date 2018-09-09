@@ -10,13 +10,13 @@ preamble:
 	go get
 	go generate
 
-build/macos/vc-zonedirector:
+build/macos/vc-zonedirector: main.go
 	GOARCH=amd64 GOOS=darwin go build -o build/macos/vc-zonedirector
 
-build/linux/vc-zonedirector:
+build/linux/vc-zonedirector: main.go
 	GOARCH=amd64 GOOS=linux go build -o build/linux/vc-zonedirector
 
-build/freebsd/vc-zonedirector:
+build/freebsd/vc-zonedirector: main.go
 	GOARCH=amd64 GOOS=freebsd go build -o build/freebsd/vc-zonedirector
 
 tarballs:

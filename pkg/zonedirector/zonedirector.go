@@ -8,6 +8,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/mcuadros/go-version"
+	"github.com/soniah/gosnmp"
 	"gopkg.in/headzoo/surf.v1"
 )
 
@@ -16,16 +17,18 @@ const BaseURI = "https://support.ruckuswireless.com"
 
 // Release represents a single firmware release from the vendor.
 type Release struct {
-	OK            bool
-	BaseVersion   string
-	ID            string
-	Version       string
-	VersionString string
-	URI           string
-	Description   string
-	FileType      string
-	Date          time.Time
-	Epoch         int64
+	OK             bool
+	BaseVersion    string
+	ID             string
+	Version        string
+	VersionString  string
+	URI            string
+	Description    string
+	FileType       string
+	Date           time.Time
+	Epoch          int64
+	RunningVersion string
+	VersionMatch   bool
 }
 
 // ImportRow parses an HTML row from the website into a Release object.
@@ -71,6 +74,41 @@ func (r *Release) ImportRow(s *goquery.Selection) error {
 	r.OK = true
 
 	return nil
+}
+
+func (r *Release) GetRunningVersion(hostname string, port uint16, community string) error {
+	oids := []string{"1.3.6.1.4.1.25053.1.2.1.1.1.1.18.0"}
+
+	params := &gosnmp.GoSNMP{
+		Target:    hostname,
+		Port:      port,
+		Community: community,
+		Version:   gosnmp.Version2c,
+		Timeout:   time.Duration(2) * time.Second,
+	}
+
+	{
+		err := params.Connect()
+		if err != nil {
+			return err
+		}
+	}
+
+	defer params.Conn.Close()
+
+	{
+		result, err := params.Get(oids)
+		if err != nil {
+			return err
+		}
+
+		for _, variable := range result.Variables {
+			r.RunningVersion = string(variable.Value.([]byte))
+			return nil
+		}
+	}
+
+	return errors.New("Unable to find current version from appliance")
 }
 
 // ExpandedVersion takes a literal version string and converts it into tha

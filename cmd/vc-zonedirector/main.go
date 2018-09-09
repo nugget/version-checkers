@@ -18,6 +18,15 @@ func main() {
 	latest := zonedirector.FindLatest(releaseList, "IMG")
 	//fmt.Printf("latest: %+v\n\n", latest)
 
+	err = latest.GetRunningVersion("zonedirector.nuggethaus.net", 161, "zabbixy")
+	if err != nil {
+		panic(fmt.Sprintf("Cannot find running version: %v", err))
+	}
+
+	if latest.RunningVersion == latest.VersionString {
+		latest.VersionMatch = true
+	}
+
 	json, err := json.Marshal(latest)
 	if err != nil {
 		panic(fmt.Sprintf("Cannot parse json: %v", err))
